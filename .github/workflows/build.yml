@@ -2,7 +2,7 @@ name: build
 on: 
   push:
   pull_request:
-  workflow_dispatch: # Allows you to manually trigger the build from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build:
@@ -66,12 +66,14 @@ jobs:
         export ASEPRITE=$PWD/build/bin/aseprite
         cd tests
         bash run-tests.sh
-    - name: Package Aseprite Windows Binary
+    - name: Clean Packaging (Fixes 1.3GB Size)
       shell: bash
       run: |
         mkdir -p aseprite-windows
-        cp -r build/bin/* aseprite-windows/
-    - name: Upload Windows Build Artifact
+        # Strictly copy the executable and the configuration data folder
+        cp build/bin/aseprite.exe aseprite-windows/
+        cp -r build/bin/data aseprite-windows/
+    - name: Upload Small Build Artifact
       uses: actions/upload-artifact@v4
       with:
         name: aseprite-windows-x64
